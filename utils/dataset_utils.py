@@ -31,42 +31,6 @@ def DataLoader_ISM(name, args):
     print("Finish load data!")
     return data
 
-def gen_feature(name, G: nx.Graph(), origin_str_graph=None, node_dic=None):
-    """ ----------
-    G : 节点类型int
-    origin_str_graph: 节点类型str
-    node_dic : origin_str_graph 和 G 节点间的映射关系
-    ------- """
-
-    partition = community_louvain.best_partition(G)
-    pt_list = [partition[i] for i in range(G.number_of_nodes())]
-    one_hot = torch.diag(torch.ones(max(pt_list) + 1))
-
-    path = os.path.join('..', 'data', name, name + '_struc.pt')
-    struc = torch.load(path)
-
-    feature_num = 5 + max(pt_list) + 1 + struc[list(origin_str_graph.nodes)[0]].size
-
-    feat = torch.zeros((G.number_of_nodes(), feature_num), dtype=torch.float)
-    cn = nx.core_number(G)
-    dc = nx.degree(G)
-    dc_list = [dc[i] for i in range(G.number_of_nodes())]
-    neighbor_degree_list = neighbor_degree(G, dc_list)
-    h_list = H_index(G, dc_list)
-    node_triangle = create_triangle_for_node(G)[0]
-
-    for node in G.nodes:
-        feat[int(node)][0] = cn[node]
-        feat[int(node)][1] = dc[node]
-        feat[int(node)][2] = neighbor_degree_list[0, node]
-        feat[int(node)][3] = node_triangle[0, node]
-        feat[int(node)][4] = h_list[node]
-        feat[int(node), 5: 5 + max(pt_list) + 1] = one_hot[pt_list[int(node)]]
-    for node in range(origin_str_graph.number_of_nodes()):
-        feat[node_dic[list(origin_str_graph.nodes)[node]], (5 + max(pt_list) + 1): feature_num] = struc[
-            list(origin_str_graph.nodes)[node]].size
-    return feat
-
 
 def get_feature(graph_name, hubOrder, metric):
     "若metric是字符串"
@@ -78,7 +42,7 @@ def get_feature(graph_name, hubOrder, metric):
     for mm in metric:
         if mm in ['degree', 'dc']:
             t = torch.from_numpy(pd.read_csv(get_Hdegree_path(graph_name, hubOrder)).values[:, 0])
-        elif mm in ['ND', 'neighbor_degree','nd']:
+        elif mm in ['ND', 'neighbor_degree', 'nd']:
             t = torch.from_numpy(pd.read_csv(get_HND_path(graph_name, hubOrder)).values[:, 0])
         elif mm in ['hIndex']:
             t = torch.from_numpy(pd.read_csv(get_HhIndex_path(graph_name, hubOrder)).values[:, 0])
@@ -90,20 +54,6 @@ def get_feature(graph_name, hubOrder, metric):
         rel = torch.concat((rel, t.view(-1, 1)), dim=1)
 
     return rel
-
-
-def generate_graph(path):
-    G = nx.read_edgelist(path, create_using=nx.Graph(), nodetype=str)
-    # graph = nx.read_edgelist(path, create_using=nx.Graph(), nodetype=int)
-    node_dic = {}  # 创造一个int和str的映射
-    node_temp = 0
-    for node in G.nodes:
-        node_dic[node] = node_temp
-        node_temp += 1
-    graph = nx.Graph()
-    for edge in G.edges:
-        graph.add_edge(node_dic[edge[0]], node_dic[edge[1]])
-    return graph, node_dic, G
 
 
 def generate_feature_2_simplex(name, order):

@@ -118,7 +118,7 @@ if __name__ == '__main__':
                     test_acc, best_val_acc, Gamma_0, Gamma_1, best_model = RunExp(args, data, Net)
 
                     print("==============correlation==============")
-                    our_tau_list, dc_tau_list, ks_tau_list, nd_tau_list, hi_tau_list, MRCNN_tau_list, bc_tau_list, vc_tau_list = compare_tau(
+                    our_tau_list, dc_tau_list, ks_tau_list, nd_tau_list, hi_tau_list = compare_tau(
                         data, best_model, args.dataset, args.hubOrder)
 
                     # sir_list_true = data.y.cpu().numpy()
@@ -142,7 +142,4 @@ if __name__ == '__main__':
                 p.write(str(best_ks_tau_list) + ',')
                 p.write(str(best_nd_tau_list) + ',')
                 p.write(str(best_hi_tau_list) + ',')
-                p.write(str(MRCNN_tau_list) + ',')
-                p.write(str(bc_tau_list) + ',')
-                p.write(str(vc_tau_list) + ',')
                 p.write(str('\n'))

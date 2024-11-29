@@ -32,7 +32,9 @@ Detected an inconsistency between mining influential nodes and simplices. Innova
 </div>
 
 # How to use？
-step 1: Run dataProcess.py
+step 1: Run dataProcess.py 
+
+
 step 2: Run train_model_gridSearch.py
 
 

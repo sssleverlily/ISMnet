@@ -31,6 +31,10 @@ Detected an inconsistency between mining influential nodes and simplices. Innova
     <img src="figs/framework.png" alt="Framework">
 </div>
 
+# How to use？
+step 1: Run dataProcess.py
+step 2: Run train_model_gridSearch.py
+
 
 # Citation
 Please cite our work if you find our code/paper is useful to your work. :
